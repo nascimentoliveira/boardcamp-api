@@ -1,16 +1,13 @@
 import { connection } from '../database/database.js';
 
-export async function insertCategory(req, res) {
-  const { name } = res.locals.category;
+export async function listCategories(req, res) {
 
   try {
-    await connection.query(`
-      INSERT INTO categories 
-      (name)
-      VALUES ($1)`,
-      [name]
-    );
-    res.sendStatus(201);
+    const categories = (await connection.query(`
+      SELECT * 
+      FROM categories`,
+    )).rows;
+    res.status(200).send(categories);
 
   } catch (err) {
     console.error('An error has occurred: ', err);
@@ -20,13 +17,18 @@ export async function insertCategory(req, res) {
   return;
 }
 
-export async function listCategories(req, res) {
+export async function insertCategory(req, res) {
+  
+  const { name } = res.locals.category;
+
   try {
-    const categories = (await connection.query(`
-      SELECT * 
-      FROM categories`,
-    )).rows;
-    res.status(200).send(categories);
+    await connection.query(`
+      INSERT INTO categories 
+      ("name")
+      VALUES ($1)`,
+      [name]
+    );
+    res.sendStatus(201);
 
   } catch (err) {
     console.error('An error has occurred: ', err);
