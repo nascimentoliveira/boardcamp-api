@@ -2,12 +2,20 @@ import { connection } from '../database/database.js';
 
 export async function listCustomers(req, res) {
 
+  const queryParams = Object.fromEntries([
+    [`WHERE cpf LIKE $x||'%'`, req.query.cpf],
+    [`OFFSET $x`, req.query.offset],
+    [`LIMIT $x`, req.query.limit]
+  ]
+  .filter(param => param[1] !== undefined)
+  .map((param, index) => [param[0].replace('$x', '$' + (index+1)), param[1]]));
+
   try {
     const customers = (await connection.query(`
       SELECT *
-      FROM   customers 
-      ${req.query.cpf ? `WHERE cpf LIKE $1||'%';` : `;`}`,
-      req.query.cpf ? [req.query?.cpf] : null
+      FROM   customers
+      ${Object.keys(queryParams).join(' ')};`,
+      Object.values(queryParams)
     )).rows;
 
     customers.forEach(customer => {

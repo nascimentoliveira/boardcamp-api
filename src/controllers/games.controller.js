@@ -2,13 +2,21 @@ import { connection } from '../database/database.js';
 
 export async function listGames(req, res) {
 
+  const queryParams = Object.fromEntries([
+    [`WHERE games.name ILIKE $x||'%'`, req.query.name],
+    [`OFFSET $x`, req.query.offset],
+    [`LIMIT $x`, req.query.limit]
+  ]
+  .filter(param => param[1] !== undefined)
+  .map((param, index) => [param[0].replace('$x', '$' + (index+1)), param[1]]));
+
   try {
     const games = (await connection.query(`
       SELECT games.*, categories.name as "categoryName"
       FROM   games 
       JOIN   categories ON games."categoryId"=categories.id
-      ${req.query.name ? `WHERE games.name ILIKE $1||'%'` : ``};`,
-      req.query.name ? [req.query.name] : null
+      ${Object.keys(queryParams).join(' ')};`,
+      Object.values(queryParams)
     )).rows;
 
     res.status(200).send(games);

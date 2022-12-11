@@ -2,6 +2,17 @@ import { connection } from '../database/database.js';
 
 export async function listRentals(req, res) {
 
+  let count = 0;
+
+  const queryParams = Object.fromEntries([
+    [`WHERE rentals."customerId"=$x`, req.query.customerId],
+    [`WHERE rentals."gameId"=$x`, req.query.gameId],
+    [`OFFSET $x`, req.query.offset],
+    [`LIMIT $x`, req.query.limit]
+  ]
+  .filter(param => param[1] !== undefined)
+  .map((param, index) => [param[0].replace('$x', '$' + (index+1)), param[1]]));
+
   try {
     const rentals = (await connection.query(`
       SELECT rentals.*, 
@@ -23,12 +34,21 @@ export async function listRentals(req, res) {
       JOIN     games ON games.id=rentals."gameId"
       JOIN     categories ON categories.id=games."categoryId"
 
-      ${req.query.customerId ? `WHERE rentals."customerId"=$1` : ``}
-      ${req.query.gameId ? req.query.customerId ? `AND rentals."gameId"=$2` : `WHERE rentals."gameId"=$1` : ``}
+      ${Object.keys(queryParams)
+        .filter(query => query.includes('WHERE'))
+        .join(' ')
+        .replaceAll('WHERE', v => count++ > 0 ? 'AND' : v)
+      }
       
-      GROUP BY rentals.id, customers.id, games.id, categories.id;`,
+      GROUP BY rentals.id, customers.id, games.id, categories.id
 
-      [req.query.customerId, req.query.gameId].filter(elem => elem !== undefined)
+      ${Object.keys(queryParams)
+        .filter(query => !query.includes('WHERE'))
+        .join(' ')
+      }
+      ;`,
+
+      Object.values(queryParams)
     )).rows;
 
     rentals.forEach(rental => {

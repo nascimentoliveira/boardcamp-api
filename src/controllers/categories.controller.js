@@ -2,10 +2,19 @@ import { connection } from '../database/database.js';
 
 export async function listCategories(req, res) {
 
+  const queryParams = Object.fromEntries([
+    [`OFFSET $x`, req.query.offset],
+    [`LIMIT $x`, req.query.limit]
+  ]
+  .filter(param => param[1] !== undefined)
+  .map((param, index) => [param[0].replace('$x', '$' + (index+1)), param[1]]));
+
   try {
     const categories = (await connection.query(`
       SELECT * 
-      FROM   categories;`
+      FROM   categories
+      ${Object.keys(queryParams).join(' ')};`,
+      Object.values(queryParams)
     )).rows;
 
     res.status(200).send(categories);
