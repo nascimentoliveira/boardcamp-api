@@ -5,14 +5,16 @@ export async function listCustomers(req, res) {
   try {
     const customers = (await connection.query(`
       SELECT *
-      FROM customers 
+      FROM   customers 
       ${req.query.cpf ? `WHERE cpf LIKE $1||'%';` : `;`}`,
       req.query.cpf ? [req.query?.cpf] : null
     )).rows;
+
+    customers.forEach(customer => {
+      customer.birthday = customer.birthday.toISOString().slice(0, 10);
+    });
     
-    res.status(200).send(customers.map(customer => {
-      return { ...customer, birthday: customer.birthday.toISOString().slice(0, 10) }
-    }));
+    res.status(200).send(customers);
 
   } catch (err) {
     console.error('An error has occurred: ', err);
@@ -29,12 +31,14 @@ export async function listCustomerById(req, res) {
   try {
     const customer = (await connection.query(`
       SELECT *
-      FROM customers 
-      WHERE id = $1;`,
+      FROM   customers 
+      WHERE  "id" = $1;`,
       [customerId]
     )).rows;
 
-    res.status(200).send({ ...customer, birthday: customer.birthday.toISOString().slice(0, 10) });
+    customer.birthday = customer.birthday.toISOString().slice(0, 10);
+
+    res.status(200).send(customer);
     
   } catch (err) {
     console.error('An error has occurred: ', err);
@@ -57,7 +61,7 @@ export async function insertCustomer(req, res) {
     await connection.query(`
       INSERT INTO customers 
       ("name", "phone", "cpf", "birthday")
-      VALUES ($1, $2, $3, $4)`,
+      VALUES ($1, $2, $3, $4);`,
       [name, phone, cpf, birthday]
     );
     res.sendStatus(201);
@@ -84,10 +88,11 @@ export async function updateCustomer(req, res) {
   try {
     await connection.query(`
       UPDATE customers 
-      SET "name"=$1, phone=$2, cpf=$3, birthday=$4 
-      WHERE id = $5;`,
-      [name, phone, cpf, birthday]
+      SET    "name"=$1, phone=$2, cpf=$3, birthday=$4 
+      WHERE  "id"=$5;`,
+      [name, phone, cpf, birthday, customerId]
     );
+    
     res.sendStatus(200);
 
   } catch (err) {

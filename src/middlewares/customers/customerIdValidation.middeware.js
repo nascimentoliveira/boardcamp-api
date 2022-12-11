@@ -1,4 +1,4 @@
-import { connection } from '../database/database.js';
+import { connection } from '../../database/database.js';
 
 export async function customerIdValidation(req, res, next) {
 
@@ -6,9 +6,9 @@ export async function customerIdValidation(req, res, next) {
 
   try {
     const customer = (await connection.query(`
-        SELECT (id)
-        FROM customers 
-        WHERE id = $1;`,
+        SELECT "id"
+        FROM    customers 
+        WHERE  "id" = $1;`,
       [customerId]
     )).rows[0]
 

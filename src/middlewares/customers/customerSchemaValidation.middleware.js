@@ -1,4 +1,4 @@
-import { customerSchema } from '../models/customer.model.js';
+import { customerSchema } from '../../models/customer.model.js';
 
 export function customerSchemaValidation(req, res, next) {
   const customer = req.body;

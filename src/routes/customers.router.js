@@ -1,8 +1,8 @@
 import { Router } from 'express';
 
-import { customerSchemaValidation } from '../middlewares/customerSchemaValidation.middleware.js';
-import { customerValidation } from '../middlewares/customerValidation.middleware.js';
-import { customerIdValidation } from '../middlewares/customerIdValidation.middeware.js';
+import { customerSchemaValidation } from '../middlewares/customers/customerSchemaValidation.middleware.js';
+import { customerValidation } from '../middlewares/customers/customerValidation.middleware.js';
+import { customerIdValidation } from '../middlewares/customers/customerIdValidation.middeware.js';
 import {
   listCustomers,
   listCustomerById,

@@ -1,12 +1,12 @@
-import { connection } from '../database/database.js';
+import { connection } from '../../database/database.js';
 
 export async function categoryValidation(req, res, next) {
   const { name } = res.locals.category;
   try {
     const category = (await connection.query(`
-      SELECT (name)
-      FROM categories 
-      WHERE name = $1;`,
+      SELECT "name"
+      FROM    categories 
+      WHERE  "name" = $1;`,
       [name]
     )).rows[0];
 

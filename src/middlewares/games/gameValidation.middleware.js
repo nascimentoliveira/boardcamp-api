@@ -1,13 +1,13 @@
-import { connection } from '../database/database.js';
+import { connection } from '../../database/database.js';
 
 export async function gameValidation(req, res, next) {
   const { name, categoryId } = res.locals.game;
 
   try {
     const category = (await connection.query(`
-      SELECT (id)
-      FROM categories 
-      WHERE id = $1;`,
+      SELECT "id"
+      FROM    categories 
+      WHERE  "id" = $1;`,
       [categoryId]
     )).rows[0];
 
@@ -17,9 +17,9 @@ export async function gameValidation(req, res, next) {
     }
 
     const game = (await connection.query(`
-      SELECT (name)
-      FROM games 
-      WHERE name = $1;`,
+      SELECT "name"
+      FROM    games 
+      WHERE  "name" = $1;`,
       [name]
     )).rows[0];
 

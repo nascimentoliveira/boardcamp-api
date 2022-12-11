@@ -1,4 +1,4 @@
-import { gameSchema } from '../models/game.model.js';
+import { gameSchema } from '../../models/game.model.js';
 
 export function gameSchemaValidation(req, res, next) {
   const game = req.body;
