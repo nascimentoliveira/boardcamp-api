@@ -1,6 +1,7 @@
 import { rentalSchema } from '../../models/rental.model.js';
 
 export function rentalSchemaValidation(req, res, next) {
+  
   const rental = req.body;
 
   const { error } = rentalSchema.validate(rental, { abortEarly: false });
@@ -14,6 +15,4 @@ export function rentalSchemaValidation(req, res, next) {
   res.locals.rental = rental;
 
   next();
-
-  return;
 }

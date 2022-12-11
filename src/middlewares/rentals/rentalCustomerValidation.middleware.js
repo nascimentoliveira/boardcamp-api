@@ -1,19 +1,19 @@
 import { connection } from '../../database/database.js';
 
-export async function customerValidation(req, res, next) {
+export async function rentalCustomerValidation(req, res, next) {
 
-  const { cpf } = res.locals.customer;
+  const { customerId } = res.locals.rental;
 
   try {
     const customer = (await connection.query(`
-      SELECT "cpf"
-      FROM    customers 
-      WHERE  "cpf" = $1;`,
-      [cpf]
+      SELECT id
+      FROM   customers 
+      WHERE  id=$1;`,
+      [customerId]
     )).rows[0];
 
-    if (customer) {
-      res.status(409).send({ message: 'Cliente já registrado(a)!' });
+    if (!customer) {
+      res.status(400).send({ message: 'Cliente não cadastrado(a)!' });
       return;
     }
 
@@ -24,6 +24,4 @@ export async function customerValidation(req, res, next) {
   }
 
   next();
-
-  return;
 }

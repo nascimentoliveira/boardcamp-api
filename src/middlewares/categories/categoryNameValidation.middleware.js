@@ -1,17 +1,19 @@
 import { connection } from '../../database/database.js';
 
-export async function categoryValidation(req, res, next) {
+export async function categoryNameValidation(req, res, next) {
+
   const { name } = res.locals.category;
+
   try {
     const category = (await connection.query(`
-      SELECT "name"
-      FROM    categories 
-      WHERE  "name" = $1;`,
+      SELECT name
+      FROM   categories 
+      WHERE  name=$1;`,
       [name]
     )).rows[0];
 
     if (category) {
-      res.status(409).send({ message: 'Categoria já registrada!' });
+      res.status(409).send({ message: 'Categoria já cadastrada!' });
       return;
     }
 
@@ -22,6 +24,4 @@ export async function categoryValidation(req, res, next) {
   }
 
   next();
-
-  return;
 }

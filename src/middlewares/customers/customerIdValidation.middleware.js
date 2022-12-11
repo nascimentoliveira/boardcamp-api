@@ -6,14 +6,14 @@ export async function customerIdValidation(req, res, next) {
 
   try {
     const customer = (await connection.query(`
-        SELECT "id"
-        FROM    customers 
-        WHERE  "id" = $1;`,
+      SELECT id
+      FROM   customers 
+      WHERE  id=$1;`,
       [customerId]
-    )).rows[0]
+    )).rows[0];
 
     if (!customer) {
-      res.status(404).send({ message: 'Registro não encontrado!' });
+      res.status(404).send({ message: 'Cliente não encontrado!' });
       return;
     }
 
@@ -26,6 +26,4 @@ export async function customerIdValidation(req, res, next) {
   }
 
   next();
-
-  return;
 }

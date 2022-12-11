@@ -1,6 +1,7 @@
 import { customerSchema } from '../../models/customer.model.js';
 
 export function customerSchemaValidation(req, res, next) {
+
   const customer = req.body;
 
   const { error } = customerSchema.validate(customer, { abortEarly: false });
@@ -14,6 +15,4 @@ export function customerSchemaValidation(req, res, next) {
   res.locals.customer = customer;
 
   next();
-
-  return;
 }

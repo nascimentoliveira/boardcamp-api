@@ -6,9 +6,9 @@ export async function rentalAvailableValidation(req, res, next) {
 
   try {
     const rentals = (await connection.query(`
-      SELECT "returnDate"
-      FROM    rentals 
-      WHERE  "gameId" = $1;`,
+      SELECT returnDate
+      FROM   rentals 
+      WHERE  "gameId"=$1;`,
       [gameId]
     )).rows;
 
@@ -24,6 +24,4 @@ export async function rentalAvailableValidation(req, res, next) {
   }
 
   next();
-
-  return;
 }

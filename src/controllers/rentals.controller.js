@@ -7,26 +7,26 @@ export async function listRentals(req, res) {
       SELECT rentals.*, 
       
       json_build_object(
-        'id', customers."id", 
-        'name', customers."name"
+        'id', customers.id, 
+        'name', customers.name
       ) AS customer,
       
       json_build_object(
-        'id', games."id", 
-        'name', games."name", 
+        'id', games.id, 
+        'name', games.name, 
         'categoryId', games."categoryId", 
-        'categoryName', categories."name"
+        'categoryName', categories.name
       ) AS game
       
       FROM     rentals
-      JOIN     customers ON customers."id" = rentals."customerId"
-      JOIN     games ON games."id" = rentals."gameId"
-      JOIN     categories ON categories."id" = games."categoryId"
+      JOIN     customers ON customers.id=rentals."customerId"
+      JOIN     games ON games.id=rentals."gameId"
+      JOIN     categories ON categories.id=games."categoryId"
 
-      ${req.query.customerId ? `WHERE rentals."customerId" = $1` : ``}
-      ${req.query.gameId ? req.query.customerId ? `AND rentals."gameId" = $2` : `WHERE rentals."gameId" = $1` : ``}
+      ${req.query.customerId ? `WHERE rentals."customerId"=$1` : ``}
+      ${req.query.gameId ? req.query.customerId ? `AND rentals."gameId"=$2` : `WHERE rentals."gameId"=$1` : ``}
       
-      GROUP BY rentals."id", customers."id", games."id", categories."id";`,
+      GROUP BY rentals.id, customers.id, games.id, categories.id;`,
 
       [req.query.customerId, req.query.gameId].filter(elem => elem !== undefined)
     )).rows;
@@ -44,8 +44,6 @@ export async function listRentals(req, res) {
     console.error('An error has occurred: ', err);
     res.status(500).send({ message: 'Ocorreu um erro interno ao servidor!' });
   }
-
-  return;
 }
 
 export async function insertRental(req, res) {
@@ -62,7 +60,16 @@ export async function insertRental(req, res) {
       INSERT INTO rentals 
       ("customerId", "gameId", "rentDate", "daysRented", "returnDate", "originalPrice", "delayFee")
       VALUES ($1, $2, $3, $4, $5, $6, $7);`,
-      [customerId, gameId, new Date().toJSON().slice(0, 10), daysRented, null, pricePerDay * daysRented, null]
+
+      [
+        customerId,
+        gameId,
+        new Date().toJSON().slice(0, 10),
+        daysRented,
+        null,
+        pricePerDay * daysRented,
+        null
+      ]
     );
 
     res.sendStatus(201);
@@ -71,10 +78,7 @@ export async function insertRental(req, res) {
     console.error('An error has occurred: ', err);
     res.status(500).send({ message: 'Ocorreu um erro interno ao servidor!' });
   }
-
-  return;
 }
-
 
 export async function finalizeRental(req, res) {
 
@@ -92,7 +96,7 @@ export async function finalizeRental(req, res) {
     await connection.query(`
       UPDATE rentals 
       SET    "returnDate"=$1, "delayFee"=$2
-      WHERE  rentals."id"=$3;`,
+      WHERE  rentals.id=$3;`,
       [new Date().toJSON().slice(0, 10), delayFee, id.toString()]
     );
 
@@ -102,8 +106,6 @@ export async function finalizeRental(req, res) {
     console.error('An error has occurred: ', err);
     res.status(500).send({ message: 'Ocorreu um erro interno ao servidor!' });
   }
-
-  return;
 }
 
 export async function deleteRental(req, res) {
@@ -114,7 +116,7 @@ export async function deleteRental(req, res) {
     await connection.query(`
       DELETE 
       FROM   rentals 
-      WHERE  "id"=$1`,
+      WHERE  id=$1`,
       [id]
     );
 
@@ -124,6 +126,4 @@ export async function deleteRental(req, res) {
     console.error('An error has occurred: ', err);
     res.status(500).send({ message: 'Ocorreu um erro interno ao servidor!' });
   }
-
-  return;
 }

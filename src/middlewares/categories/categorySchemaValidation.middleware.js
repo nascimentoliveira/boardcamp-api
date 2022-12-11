@@ -1,6 +1,7 @@
 import { categorySchema } from '../../models/category.model.js';
 
 export function categorySchemaValidation(req, res, next) {
+
   const category = req.body;
 
   const { error } = categorySchema.validate(category, { abortEarly: false });
@@ -14,6 +15,4 @@ export function categorySchemaValidation(req, res, next) {
   res.locals.category = category;
 
   next();
-
-  return;
 }

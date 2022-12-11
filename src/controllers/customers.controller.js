@@ -20,11 +20,9 @@ export async function listCustomers(req, res) {
     console.error('An error has occurred: ', err);
     res.status(500).send({ message: 'Ocorreu um erro interno ao servidor!' });
   }
-
-  return;
 }
 
-export async function listCustomerById(req, res) {
+export async function getCustomerById(req, res) {
 
   const customerId = res.locals.customerId;
 
@@ -32,7 +30,7 @@ export async function listCustomerById(req, res) {
     const customer = (await connection.query(`
       SELECT *
       FROM   customers 
-      WHERE  "id" = $1;`,
+      WHERE  id=$1;`,
       [customerId]
     )).rows;
 
@@ -44,8 +42,6 @@ export async function listCustomerById(req, res) {
     console.error('An error has occurred: ', err);
     res.status(500).send({ message: 'Ocorreu um erro interno ao servidor!' });
   }
-
-  return;
 }
 
 export async function insertCustomer(req, res) {
@@ -88,8 +84,8 @@ export async function updateCustomer(req, res) {
   try {
     await connection.query(`
       UPDATE customers 
-      SET    "name"=$1, phone=$2, cpf=$3, birthday=$4 
-      WHERE  "id"=$5;`,
+      SET    name=$1, phone=$2, cpf=$3, birthday=$4 
+      WHERE  id=$5;`,
       [name, phone, cpf, birthday, customerId]
     );
     
