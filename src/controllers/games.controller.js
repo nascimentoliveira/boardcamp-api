@@ -2,6 +2,8 @@ import { connection } from '../database/database.js';
 
 export async function listGames(req, res) {
 
+  let count = 0;
+
   const queryParams = Object.fromEntries([
     [`WHERE games.name ILIKE $x||'%'`, req.query.name],
     [`OFFSET $x`, req.query.offset],
@@ -15,7 +17,18 @@ export async function listGames(req, res) {
       SELECT games.*, categories.name as "categoryName"
       FROM   games 
       JOIN   categories ON games."categoryId"=categories.id
-      ${Object.keys(queryParams).join(' ')};`,
+      ${Object.keys(queryParams)
+        .filter(query => query.includes('WHERE'))
+        .join(' ')
+        .replaceAll('WHERE', v => count++ > 0 ? 'AND' : v)
+      }
+
+      ${req.query.order ? `ORDER BY ${req.query.order} ${req.query.desc ? 'DESC' : 'ASC' }` : ``}
+      
+      ${Object.keys(queryParams)
+        .filter(query => !query.includes('WHERE'))
+        .join(' ')
+      };`,
       Object.values(queryParams)
     )).rows;
 

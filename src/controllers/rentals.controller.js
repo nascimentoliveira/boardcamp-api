@@ -29,10 +29,10 @@ export async function listRentals(req, res) {
         'categoryName', categories.name
       ) AS game
       
-      FROM     rentals
-      JOIN     customers ON customers.id=rentals."customerId"
-      JOIN     games ON games.id=rentals."gameId"
-      JOIN     categories ON categories.id=games."categoryId"
+      FROM  rentals
+      JOIN  customers ON customers.id=rentals."customerId"
+      JOIN  games ON games.id=rentals."gameId"
+      JOIN  categories ON categories.id=games."categoryId"
 
       ${Object.keys(queryParams)
         .filter(query => query.includes('WHERE'))
@@ -42,12 +42,12 @@ export async function listRentals(req, res) {
       
       GROUP BY rentals.id, customers.id, games.id, categories.id
 
+      ${req.query.order ? `ORDER BY ${req.query.order} ${req.query.desc ? 'DESC' : 'ASC' }` : ``}
+
       ${Object.keys(queryParams)
         .filter(query => !query.includes('WHERE'))
         .join(' ')
-      }
-      ;`,
-
+      };`,
       Object.values(queryParams)
     )).rows;
 

@@ -13,6 +13,7 @@ export async function listCategories(req, res) {
     const categories = (await connection.query(`
       SELECT * 
       FROM   categories
+      ${req.query.order ? `ORDER BY ${req.query.order} ${req.query.desc ? 'DESC' : 'ASC' }` : ``}
       ${Object.keys(queryParams).join(' ')};`,
       Object.values(queryParams)
     )).rows;
